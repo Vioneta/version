@@ -1,0 +1,43 @@
+{
+  "channel": "dev",
+  "supervisor": "2024.02.0.dev0203",
+  "homeassistant": {
+    "default": "2024.3.0.dev20240204",
+    "qemux86": "2024.3.0.dev20240204",
+    "qemux86-64": "2024.3.0.dev20240204",
+    "qemuarm": "2024.3.0.dev20240204",
+    "qemuarm-64": "2024.3.0.dev20240204",
+    "generic-x86-64": "2024.3.0.dev20240204",
+    "raspberrypi": "2024.3.0.dev20240204",
+    "raspberrypi2": "2024.3.0.dev20240204",
+    "raspberrypi3": "2024.3.0.dev20240204",
+    "raspberrypi3-64": "2024.3.0.dev20240204",
+    "raspberrypi4": "2024.3.0.dev20240204",
+    "raspberrypi4-64": "2024.3.0.dev20240204",
+    "raspberrypi5-64": "2024.3.0.dev20240204"
+  },
+  "ota": "https://os-artifacts.vioneta.com/{version}/{os_name}_{board}-{version}.raucb",
+  "cli": "2023.11.0.dev2201",
+  "dns": "2023.06.dev2902",
+  "audio": "2023.12.0.dev1203",
+  "multicast": "2023.06.dev2902",
+  "observer": "2023.11.0.dev0701",
+  "image": {
+    "core": "ghcr.io/vioneta/{machine}-vionetaos",
+    "supervisor": "ghcr.io/vioneta/{arch}-hassio-supervisor",
+    "cli": "ghcr.io/vioneta/{arch}-hassio-cli",
+    "audio": "ghcr.io/vioneta/{arch}-hassio-audio",
+    "dns": "ghcr.io/vioneta/{arch}-hassio-dns",
+    "observer": "ghcr.io/vioneta/{arch}-hassio-observer",
+    "multicast": "ghcr.io/vioneta/{arch}-hassio-multicast"
+  },
+  "images": {
+    "core": "ghcr.io/vioneta/{machine}-vionetaos",
+    "supervisor": "ghcr.io/vioneta/{arch}-hassio-supervisor",
+    "cli": "ghcr.io/vioneta/{arch}-hassio-cli",
+    "audio": "ghcr.io/vioneta/{arch}-hassio-audio",
+    "dns": "ghcr.io/vioneta/{arch}-hassio-dns",
+    "observer": "ghcr.io/vioneta/{arch}-hassio-observer",
+    "multicast": "ghcr.io/vioneta/{arch}-hassio-multicast"
+  }
+}

@@ -1,0 +1,174 @@
+name: Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      files:
+        description: "File(s) to run action against"
+        required: true
+  pull_request:
+    branches: ["master"]
+  push:
+    branches: ["master"]
+    paths:
+      - "*.txt"
+      - "*.json"
+      - "*.png"
+
+env:
+  PYTHON_VERSION: "3.10"
+  COSIGN_VERSION: "v2.0.2"
+  SIGNED_FILES: "beta.json dev.json stable.json"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Lint with JQ
+        uses: Vioneta/actions/helpers/jq@master
+
+  prepare:
+    name: Prepare
+    needs: ["lint"]
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.changed_files.outputs.files }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Get changed files for push
+        if: github.event_name == 'push'
+        id: changed_files_push
+        uses: jitterbit/get-changed-files@v1
+
+      - name: Get changed files
+        id: changed_files
+        run: |
+          if [[ ${{ github.event_name }} == "push" ]]; then
+            echo "files=${{ steps.changed_files_push.outputs.all }}" >> $GITHUB_OUTPUT
+          else
+            echo "files=${{ github.event.inputs.files }}" >> $GITHUB_OUTPUT
+          fi
+
+  signing:
+    name: Sign ${{ matrix.path }}
+    needs: ["prepare"]
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      packages: write
+    strategy:
+      matrix:
+        path:
+          - stable.json
+          - beta.json
+          - dev.json
+    steps:
+      - name: Check
+        id: check
+        run: |
+          if [[ "${{ needs.prepare.outputs.files }}" =~ ${{ matrix.path }} ]]; then
+            echo "sign=yes" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout the repository
+        if: steps.check.outputs.sign == 'yes'
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        if: steps.check.outputs.sign == 'yes'
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: vioneta
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: sigstore/cosign-installer@main
+        if: steps.check.outputs.sign == 'yes'
+        with:
+          cosign-release: ${{ env.COSIGN_VERSION }}
+
+      - name: Setup Python version ${{ env.PYTHON_VERSION }}
+        if: steps.check.outputs.sign == 'yes'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install AWS CLI
+        if: steps.check.outputs.sign == 'yes'
+        run: pip install awscli
+
+      - name: Upload file
+        if: steps.check.outputs.sign == 'yes'
+        run: |
+          cosign upload blob -f ${{ matrix.path }} ghcr.io/vioneta/version/${{ matrix.path }}
+
+      - name: Sign Cosign
+        if: steps.check.outputs.sign == 'yes'
+        run: |
+          cosign sign --yes ghcr.io/vioneta/version/${{ matrix.path }}
+          cosign sign-blob --yes ${{ matrix.path }} --bundle ${{ matrix.path }}.sig
+
+      - name: Upload signature
+        if: steps.check.outputs.sign == 'yes'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 sync . s3://version.vioneta.com --exclude "*" --include "${{ matrix.path }}.sig"
+
+  upload:
+    name: Upload
+    needs: ["signing", "prepare"]
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python version ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install AWS CLI
+        run: pip install awscli
+
+      - name: Upload files
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          for file in ${{ needs.prepare.outputs.files }}; do
+            if [[ "$file" =~ \.txt|\.json|\.png ]]; then
+              aws s3 sync . s3://version.vioneta.com --exclude "*" --include "$file"
+            fi
+          done
+
+      - name: Gather files for cache flush
+        id: flush
+        run: |
+          declare -a files
+          for file in ${{ needs.prepare.outputs.files }}; do
+            if [[ "$file" =~ \.txt|\.json ]]; then
+              files+=("\"https:\/\/version.home-assistant.io\/$file\", ")
+              if [[ "${{ env.SIGNED_FILES }}" =~ $file ]]; then
+                files+=("\"https:\/\/version.home-assistant.io\/$file.sig\", ")
+              fi
+            fi
+          done
+          echo "files=[$(echo ${files[@]} | rev | cut -c 2- | rev)]" >> $GITHUB_OUTPUT
+
+      - name: Flush CloudFlare cache
+        run: |
+          curl --silent --show-error --fail -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CF_PURGE_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"files": ${{ steps.flush.outputs.files }}}'
