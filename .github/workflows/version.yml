@@ -115,8 +115,8 @@ jobs:
 
       - name: Upload signature
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.CF_TEBI_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CF_TEBI_SECRET_ACCESS_KEY }}
         run: |
           aws s3 sync . s3://version.vioneta.com --exclude "*" --include "${{ matrix.path }}.sig"
 
@@ -140,8 +140,8 @@ jobs:
 
       - name: Upload files
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.CF_TEBI_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CF_TEBI_SECRET_ACCESS_KEY }}
         run: |
           for file in ${{ needs.prepare.outputs.files }}; do
             if [[ "$file" =~ \.txt|\.json|\.png ]]; then
