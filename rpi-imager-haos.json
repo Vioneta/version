@@ -1,0 +1,56 @@
+{
+  "os_list": [
+    {
+      "name": "Vioneta OS 13.1 (RPi 5)",
+      "description": "Smart Agriculture Platform.",
+      "url": "https://github.com/Vioneta/operating-system/releases/download/13.1/haos_rpi5-64-13.1.img.xz",
+      "icon": "https://version.vioneta.com/brand/logo.png",
+      "extract_size": 2147483648,
+      "extract_sha256": "bc9a04e706a2b8697c6ddc23f2bdf87a95e7fa9190deee09699249153b48b847",
+      "release_date": "2024-08-21",
+      "image_download_size": 302581588,
+      "image_download_sha256": "5482731b64aedef52c6603a19bee7009d04f8f9e589fd641c0806246cdf12c95",
+      "website": "https://www.vioneta.com",
+      "devices": ["pi5-64bit"]
+    },
+    {
+      "name": "Vioneta OS 13.1 (RPi 4/400)",
+      "description": "Smart Agriculture Platform.",
+      "url": "https://github.com/Vioneta/operating-system/releases/download/13.1/haos_rpi4-64-13.1.img.xz",
+      "icon": "https://version.vioneta.com/brand/logo.png",
+      "extract_size": 2147483648,
+      "extract_sha256": "ca0d134398a0b56fcdeacba20acec8b27d6ca4dd09cda1412d65b5eaabe27f72",
+      "release_date": "2024-08-21",
+      "image_download_size": 294977332,
+      "image_download_sha256": "fe833661e8834f5a28e9b90399274c95e3bab318126d37e4cf7044c92c75d20a",
+      "website": "https://www.vioneta.com",
+      "devices": ["pi4-64bit"]
+    },
+    {
+      "name": "Vioneta OS 13.1 (RPi 3)",
+      "description": "Smart Agriculture Platform.",
+      "url": "https://github.com/Vioneta/operating-system/releases/download/13.1/haos_rpi3-64-13.1.img.xz",
+      "icon": "https://version.vioneta.com/brand/logo.png",
+      "extract_size": 2147483648,
+      "extract_sha256": "7a46968921e08186c9d64d26e95e4b94db42714e3b9efd2735b65ba1c1215690",
+      "release_date": "2024-08-21",
+      "image_download_size": 291116252,
+      "image_download_sha256": "172639fd62bed41afd333f4e0689fd5131e7a27d62f0d4d23198d9d85cbe645d",
+      "website": "https://www.vioneta.com",
+      "devices": ["pi3-64bit"]
+    },
+    {
+      "name": "Vioneta OS Installer for Yellow",
+      "description": "Installer for Vioneta Yellow Kit.",
+      "url": "https://github.com/Vioneta/yellow-buildroot/releases/download/yellow-installer-20231025/yellow-installer-20231025.img.xz",
+      "icon": "https://version.vioneta.com/rpi-imager-yellow-installer.png",
+      "extract_size": 68157440,
+      "extract_sha256": "7e83edc8360d6a32010b18fa3ecd6fa9a6700be5ed47c21129534581697170a5",
+      "release_date": "2023-10-25",
+      "image_download_size": 33371388,
+      "image_download_sha256": "fa1c4fdd72d116527cf37a1d3b849c480c08fff373b4a6c8d0017dae7da3e3f2",
+      "website": "https://yellow.vioneta.com",
+      "devices": ["pi4-64bit"]
+    }
+  ]
+}
