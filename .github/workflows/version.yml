@@ -145,7 +145,7 @@ jobs:
         run: |
           for file in ${{ needs.prepare.outputs.files }}; do
             if [[ "$file" =~ \.txt|\.json|\.png ]]; then
-              aws s3 sync . s3://version.vioneta.com --exclude "*" --include "$file"
+              aws s3 sync . s3://version.vioneta.com --exclude "*" --include "$file" --endpoint-url ${{ secrets.CF_TEBI_ENDPOINT_DATA }}
             fi
           done
 
